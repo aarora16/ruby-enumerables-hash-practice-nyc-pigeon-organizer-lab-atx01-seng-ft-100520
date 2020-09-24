@@ -6,7 +6,6 @@ def nyc_pigeon_organizer(data)
   push_pigeon_gender(data)
   push_pigeon_lives(data)
   @pigeon_hash
-  
 end
 
 
