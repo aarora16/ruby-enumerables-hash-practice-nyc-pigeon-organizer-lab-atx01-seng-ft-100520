@@ -1,58 +1,85 @@
 require 'pry'
-@pigeon_names = []
-@pigeon_classifications = []
-@starter_keys = nil
-@pigeon_hash = Hash.new
 
 def nyc_pigeon_organizer(data)
-  pigeon_values(data)
-  pigeon_keys(data)
-  @pigeon_hash = Hash[@pigeon_names.map {|key, value| [key, value]}]
-  binding.pry
+  merge_arrays(data)
+  push_pigeon_color(data)
+  push_pigeon_gender(data)
+  push_pigeon_lives(data)
 end
 
 
-def pigeon_keys(data)
-  @starter_keys = data.keys
-  color_keys = data[:color].keys
-  gender_keys = data[:gender].keys
-  lives_keys = data[:lives].keys
-  @pigeon_classifications = color_keys + gender_keys + lives_keys
+def collect_names(data)
+  colors = data.values[0].values
+  @names = colors.flatten!.uniq
 end
 
 
-def pigeon_values(data)
-  first_values = data.values
-  second_values = []
-  first_values.each do |pigeon|
-    second_values.push(pigeon.values)
+def collect_keys(data)
+  @generic_keys = data.keys
+  @specific_colors = data.values[0].keys 
+  @specific_genders = data.values[1].keys
+  @specific_lives = data.values[2].keys
+end
+
+
+def insert_to_hash(data)
+  collect_keys(data)
+  merge_arrays(data)
+  test = data.key("Theo")
+
+  # binding.pry
+end
+
+
+def merge_arrays(data)
+  collect_names(data)
+  collect_keys(data)
+
+  name_array = @names.each_slice(1).map {|key, value| [key, value]}
+
+  @pigeon_hash = Hash[name_array.map {|key, value| [key, value]}]
+
+  @names.each do |key|
+    @pigeon_hash[key] = Hash[@generic_keys.map {|key, value| [key, value = []]}]
   end
-  @pigeon_names = second_values.flatten.uniq
 end
 
 
-pigeon_color(data)
-  
+def push_pigeon_color(data)
+  color_keys = data[:color].keys
+
+  color_keys.each do |key|
+    @names.each do |name|
+      if data.dig(:color, key).include?(name)
+        @pigeon_hash[name][:color].push(key.to_s)
+      end
+    end
+  end
 end
 
 
-test_data = {
-        :color => {
-          :purple => ["Theo", "Peter Jr.", "Lucky"],
-          :grey => ["Theo", "Peter Jr.", "Ms. K"],
-          :white => ["Queenie", "Andrew", "Ms. K", "Alex"],
-          :brown => ["Queenie", "Alex"]
-        },
-        :gender => {
-          :male => ["Alex", "Theo", "Peter Jr.", "Andrew", "Lucky"],
-          :female => ["Queenie", "Ms. K"]
-        },
-        :lives => {
-          "Subway" => ["Theo", "Queenie"],
-          "Central Park" => ["Alex", "Ms. K", "Lucky"],
-          "Library" => ["Peter Jr."],
-          "City Hall" => ["Andrew"]
-        }
-}
 
-nyc_pigeon_organizer(test_data)
+def push_pigeon_gender(data)
+  gender_keys = data[:gender].keys
+
+  gender_keys.each do |key|
+    @names.each do |name|
+      if data.dig(:gender, key).include?(name)
+        @pigeon_hash[name][:gender].push(key.to_s)
+      end
+    end
+  end 
+end
+
+
+def push_pigeon_lives(data)
+  lives_keys = data[:lives].keys
+
+  lives_keys.each do |key|
+    @names.each do |name|
+      if data.dig(:lives, key).include?(name)
+        @pigeon_hash[name][:lives].push(key.to_s)
+      end
+    end
+  end 
+end
