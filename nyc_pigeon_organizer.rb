@@ -5,7 +5,8 @@ def nyc_pigeon_organizer(data)
   push_pigeon_color(data)
   push_pigeon_gender(data)
   push_pigeon_lives(data)
-  merge_arrays(data)
+  @pigeon_hash
+  
 end
 
 
